@@ -1,31 +1,34 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const coinRoutes = require('./routes/coinRoutes');
-const startCron = require('./cron/fetchHistory');
+const dotenv = require('dotenv');
+const coinRoutes = require('./routes/coinRoutes'); // adjust if path is different
 
+dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI;
 
-app.use(cors());
+// Middleware
 app.use(express.json());
 
-// Routes
+// Root route for testing Render
+app.get('/', (req, res) => {
+  res.send('Crypto API is running...');
+});
+
+// Mount API routes
 app.use('/api', coinRoutes);
 
-// MongoDB Connection
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      startCron(); // ⏱ Start your hourly task
-    });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection failed:', err.message);
-    process.exit(1); // Important: exit if DB fails
+// MongoDB Connection and Start Server
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => {
+  console.log('✅ Connected to MongoDB');
+  const PORT = process.env.PORT || 10000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
   });
+})
+.catch(err => {
+  console.error('❌ MongoDB connection error:', err.message);
+});
