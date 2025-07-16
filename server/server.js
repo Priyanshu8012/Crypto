@@ -6,23 +6,26 @@ const coinRoutes = require('./routes/coinRoutes');
 const startCron = require('./cron/fetchHistory');
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI;
+
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use('/api', coinRoutes);
 
-// 🟢 Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('✅ Connected to MongoDB'); // ✅ Connection message
-  app.listen(process.env.PORT, () => {
-    console.log(`🚀 Server running on port ${process.env.PORT}`);
-    startCron(); // 🕐 Start cron job after DB is ready
+// MongoDB Connection
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      startCron(); // ⏱ Start your hourly task
+    });
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection failed:', err.message);
+    process.exit(1); // Important: exit if DB fails
   });
-})
-.catch(err => {
-  console.error('❌ MongoDB connection failed:', err.message);
-});

@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+// models/Coin.js
+const mongoose = require('mongoose');
 
 const coinSchema = new mongoose.Schema({
   coinId: String,
@@ -7,7 +8,7 @@ const coinSchema = new mongoose.Schema({
   price: Number,
   marketCap: Number,
   change24h: Number,
-  lastUpdated: Date
+  lastUpdated: Date,
 });
 
-module.exports = mongoose.model("Coin", coinSchema);
+module.exports = mongoose.model('Coin', coinSchema);
