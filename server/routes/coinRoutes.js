@@ -33,15 +33,14 @@ router.get('/coins', async (req, res) => {
 });
 
 // 🟢 POST /api/history — Save snapshot of current coins
-router.post('/history', async (req, res) => {
+// 🟢 GET /api/history — Fetch all history records
+router.get('/history', async (req, res) => {
   try {
-    const currentData = await Coin.find();
-    await History.insertMany(currentData);
-    console.log("🕓 History snapshot recorded");
-    res.status(201).json({ message: 'History recorded' });
+    const records = await History.find().sort({ lastUpdated: -1 });
+    res.json(records);
   } catch (err) {
-    console.error("❌ Error saving history:", err.message);
-    res.status(500).json({ message: "Failed to record history." });
+    console.error("❌ Error fetching history:", err.message);
+    res.status(500).json({ message: "Failed to fetch history." });
   }
 });
 
